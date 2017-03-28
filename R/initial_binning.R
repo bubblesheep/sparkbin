@@ -22,7 +22,7 @@
 #' obj <- list(cuts = c(-Inf, 1.5, 10, Inf),
 #'             good = c(200, 300, 500),
 #'             bad = c(100, 300, 900),
-#'             missing = c(good = 50, bad = 50))
+#'             _Missing_ = c(good = 50, bad = 50))
 #' @export
 #'
 bin_init_num <- function(sdf, x, y, init_bins = 100) {
@@ -51,7 +51,8 @@ bin_init_num <- function(sdf, x, y, init_bins = 100) {
 #' obj <- list(xlevels = c("A", "B", "_Missing_", "_Other_"),
 #'             ylevels = c("A", "B", "_Missing_", "_Other_"),
 #'             good = c(200, 200, 200, 200),
-#'             bad = c(100, 200, 300, 400))
+#'             bad = c(100, 200, 300, 400),
+#'             minp = 0.01)
 #' @export
 #'
 bin_init_char <- function(sdf, x, y, minp = 0.01) {
