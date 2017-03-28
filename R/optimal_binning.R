@@ -24,7 +24,7 @@ bin_tree.intervalbin <- function(x, ...) {
 
 }
 
-#' Optimal binning using tree for numeric variable
+#' Optimal binning using tree for character variable
 #'
 #' @param x the initial binning object
 #' @param ... additional parameters passed to tree function call
