@@ -15,6 +15,7 @@ The binning class data structure is essential in the whole process.
 
 ##### Numeric Binning (intervalbin class)
 The intervalbin class contains the following fields
+
 - **cuts**: the cutting points from -Inf to Inf, example `c(-Inf, 1.5, 10, Inf)`
 - **good**: the vector of counts for good (0) of the buckets created by cuts, example `c(200, 300, 500)`
 - **bad**: the vector of counts for bad (1) of the buckets created by cuts, example `c(100, 300, 900)`
