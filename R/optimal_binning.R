@@ -13,8 +13,6 @@ bin_tree <- function(x, ...) {
   UseMethod("bin_tree")
 }
 
-
-
 #' Optimal binning using tree for numeric variable
 #'
 #' @param x the initial binning object
@@ -43,13 +41,15 @@ bin_tree.intervalbin <- function(x, ...) {
   cuts <- c()
   extract_terminal(fit@tree)
   # Obtain new counts for good and bad
+  # In the tree the range is left < x <= right
+  # The number in the cuts is is corresponding to ith interval
   cuts <- sort(cuts)
-  newcuts <- c(cuts, length(x$good))
+  newcuts <- unique(c(cuts, length(x$good)))
   newgood <- sapply(newcuts, function(i) sum(x$good[1:i]))
-  newgood <- diff(newgood)
+  newgood <- diff(c(0, newgood))
   newbad <- sapply(newcuts, function(i) sum(x$bad[1:i]))
-  newbad <- diff(newbad)
-  cuts <- c(x$cuts[sort(cuts)], Inf)
+  newbad <- diff(c(0, newbad))
+  cuts <- unique(c(-Inf, x$cuts[sort(cuts) + 1], Inf))
 
   newobj <- list(cuts = cuts,
                  good = newgood,
