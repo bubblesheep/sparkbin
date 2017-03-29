@@ -135,10 +135,10 @@ bin_init_char <- function(sdf, x, y, minp = 0.01) {
   # format result
   obj <- list(xlevels = obj_df$var_2,
               ylevels = obj_df$var_2,
-              good = obj_df$good,
-              bad = obj_df$bad,
+              good = as.numeric(obj_df$good),
+              bad = as.numeric(obj_df$bad),
               minp = minp)
 
-  class(obj) <- "nomialbin"
+  class(obj) <- "nominalbin"
   return(obj)
 }
