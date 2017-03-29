@@ -26,7 +26,52 @@
 #' @export
 #'
 bin_init_num <- function(sdf, x, y, init_bins = 100) {
-  NULL
+  
+  # rename columns for dplyr *_ dynamic references
+  sdf <- sdf %>% rename_('var'=x, 'target'=y) %>% select(var, target)
+  
+  # get missing counts
+  # TODO: make this prettier
+  # expr <- paste0('is.na(var) & target==1')
+  missing_count <- sdf %>% filter(is.na(var) & target==0) %>% summarise(n=n()) %>% collect()
+  missing_good <- missing_count$n
+  
+  # expr <- paste0('is.na(', x, ') & target==0')
+  missing_count <- sdf %>% filter(is.na(var) & target==1) %>% summarise(n=n()) %>% collect()
+  missing_bad <- missing_count$n
+  
+  # calcualte n-tiles
+  sdf <- sdf %>% mutate(var = as.numeric(var))
+  
+  sdf_q <- ft_quantile_discretizer(sdf, 'var', 'var_cut', init_bins) 
+  
+  # get counts
+  sdf_cut_counts <- sdf_q %>%
+    filter(!is.na(var)) %>%
+    group_by(var_cut) %>%
+    summarise(cuts_lower = min(var),
+              cuts_higher = max(var),
+              n = n(),
+              bad = sum(target),
+              good = n() - sum(target)
+    ) %>%
+    ungroup() %>%
+    arrange(var_cut) %>%
+    # mutate(cuts = paste("[", ifelse(dti_out == 0, "-Inf", cuts_lower), ",", ifelse(dti_out == 9, "Inf", cuts_higher), "]")) %>%
+    sdf_register("sdf_cut_counts")
+  
+  # pull results to local  
+  sdf_cuts_local <- collect(sdf_cut_counts)
+  
+  # format final object
+  obj <- list(cuts = c(-Inf, sdf_cuts_local$cuts_lower[-1], Inf),
+              good = sdf_cuts_local$good,
+              # n = sdf_cuts_local$n,
+              bad = sdf_cuts_local$bad,
+              '_Missing_' = c('good' = missing_good, 'bad' = missing_bad))
+  
+  class(obj) <- "intervalbin"
+  return(obj)
 }
 
 # Character binning------------------------------------------------------------
