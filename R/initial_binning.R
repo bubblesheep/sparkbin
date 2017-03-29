@@ -103,3 +103,38 @@ bin_init_num <- function(sdf, x, y, init_bins = 100) {
 bin_init_char <- function(sdf, x, y, minp = 0.01) {
   NULL
 }
+
+x = 'purpose'
+y = 'target'
+minp = 0.01
+
+# rename columns for dplyr *_ dynamic references
+sdf <- sdf %>% rename_('var'=x, 'target'=y) %>% select(var, target)
+
+# missing counts first
+missing_df <- sdf %>% filter(is.na(var)) %>% 
+  summarise(n=n(), bad = sum(target), good = n() - sum(target)) %>% 
+  collect()
+
+missing_df[is.na(missing_df)] <- 0
+
+# non-missing counts
+counts <- sdf %>% 
+  filter(!is.na(var)) %>%
+  group_by(var) %>%
+  summarise(count = n(),
+            bad = sum(target),
+            good = n() - sum(target)) %>%
+  collect() 
+
+counts <- mutate(counts,  prop = count/sum(count))
+
+# combine small (n < minp) groups into other  
+obj_df <- counts %>%
+  mutate(var_2 = ifelse(counts$prop > minp, counts$var, "_OTHER_")) %>%
+  group_by(var_2) %>%
+  summarise(count = sum(count),
+            bad = sum(bad),
+            good = sum(good))
+
+rbind(obj_df, c('_Missing_', missing_df$n, missing_df$bad, missing_df$good))
