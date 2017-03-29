@@ -80,7 +80,7 @@ obj <- list(
 class(obj) <- "nominalbin"
 
 
-# initial_binning examples -------------------------------
+# bin_init_num examples -------------------------------
 
 # get initial cuts for the numeric variable (dti)
 df <- bin_init_num(sdf, 'dti', 'target', 100)
@@ -93,4 +93,19 @@ df
 
 # get initial cuts for column with some missing values
 df <- bin_init_num(sdf, 'annual_inc', 'target', 100)
+df
+
+# bin_init_char examples -------------------------------
+
+# get initial cuts for the numeric variable (dti)
+df <- bin_init_char(sdf, 'home_ownership', 'target', .01)
+df
+
+# get initial cuts for integer variable 
+# sdf <- sdf %>% mutate(dti_integer = row_number()) # create an integer variable to test
+df <- bin_init_char(sdf, 'emp_length', 'target', .01)
+df
+
+# get initial cuts for column with some missing values
+df <- bin_init_char(sdf, 'purpose', 'target', .01)
 df
