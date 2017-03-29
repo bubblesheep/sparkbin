@@ -3,3 +3,5 @@
 .RData
 .Ruserdata
 sampledata
+log4j.spark.log
+*.log
