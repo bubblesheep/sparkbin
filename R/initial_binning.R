@@ -26,25 +26,25 @@
 #' @export
 #'
 bin_init_num <- function(sdf, x, y, init_bins = 100) {
-  
+
   # rename columns for dplyr *_ dynamic references
   sdf <- sdf %>% rename_('var'=x, 'target'=y) %>% select(var, target)
-  
+
   # get missing counts
   # TODO: make this prettier
   # expr <- paste0('is.na(var) & target==1')
   missing_count <- sdf %>% filter(is.na(var) & target==0) %>% summarise(n=n()) %>% collect()
   missing_good <- missing_count$n
-  
+
   # expr <- paste0('is.na(', x, ') & target==0')
   missing_count <- sdf %>% filter(is.na(var) & target==1) %>% summarise(n=n()) %>% collect()
   missing_bad <- missing_count$n
-  
+
   # calcualte n-tiles
   sdf <- sdf %>% mutate(var = as.numeric(var))
-  
-  sdf_q <- ft_quantile_discretizer(sdf, 'var', 'var_cut', init_bins) 
-  
+
+  sdf_q <- ft_quantile_discretizer(sdf, 'var', 'var_cut', init_bins)
+
   # get counts
   sdf_cut_counts <- sdf_q %>%
     filter(!is.na(var)) %>%
@@ -59,17 +59,17 @@ bin_init_num <- function(sdf, x, y, init_bins = 100) {
     arrange(var_cut) %>%
     # mutate(cuts = paste("[", ifelse(dti_out == 0, "-Inf", cuts_lower), ",", ifelse(dti_out == 9, "Inf", cuts_higher), "]")) %>%
     sdf_register("sdf_cut_counts")
-  
-  # pull results to local  
+
+  # pull results to local
   sdf_cuts_local <- collect(sdf_cut_counts)
-  
+
   # format final object
   obj <- list(cuts = c(-Inf, sdf_cuts_local$cuts_lower[-1], Inf),
               good = sdf_cuts_local$good,
               # n = sdf_cuts_local$n,
               bad = sdf_cuts_local$bad,
-              '_Missing_' = c('good' = missing_good, 'bad' = missing_bad))
-  
+              Missing = c('good' = missing_good, 'bad' = missing_bad))
+
   class(obj) <- "intervalbin"
   return(obj)
 }
@@ -104,41 +104,41 @@ bin_init_char <- function(sdf, x, y, minp = 0.01) {
 
   # rename columns for dplyr *_ dynamic references
   sdf <- sdf %>% rename_('var'=x, 'target'=y) %>% select(var, target)
-  
+
   # missing counts first
-  missing_df <- sdf %>% filter(is.na(var)) %>% 
-    summarise(n=n(), bad = sum(target), good = n() - sum(target)) %>% 
+  missing_df <- sdf %>% filter(is.na(var)) %>%
+    summarise(n=n(), bad = sum(target), good = n() - sum(target)) %>%
     collect()
-  
+
   missing_df[is.na(missing_df)] <- 0
-  
+
   # non-missing counts
-  counts <- sdf %>% 
+  counts <- sdf %>%
     filter(!is.na(var)) %>%
     group_by(var) %>%
     summarise(count = n(),
               bad = sum(target),
               good = n() - sum(target)) %>%
-    collect() 
-  
+    collect()
+
   counts <- mutate(counts,  prop = count/sum(count))
-  
-  # combine small (n < minp) groups into other  
+
+  # combine small (n < minp) groups into other
   obj_df <- counts %>%
     mutate(var_2 = ifelse(counts$prop > minp, counts$var, "_Other_")) %>%
     group_by(var_2) %>%
     summarise(count = sum(count),
               bad = sum(bad),
-              good = sum(good)) %>% 
+              good = sum(good)) %>%
     rbind(c('_Missing_', missing_df$n, missing_df$bad, missing_df$good))
-  
+
   # format result
   obj <- list(xlevels = obj_df$var_2,
               ylevels = obj_df$var_2,
               good = obj_df$good,
               bad = obj_df$bad,
               minp = minp)
-  
+
   class(obj) <- "nomialbin"
   return(obj)
 }
