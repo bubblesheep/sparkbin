@@ -51,7 +51,7 @@ bin_table <- function(x) {
 #' @export
 #'
 bin_table.intervalbin <- function(x) {
-  group <- sprintf("[%s,%s)", x$cuts[-length(x$cuts)], x$cuts[-1])
+  group <- sprintf("(%s,%s]", x$cuts[-length(x$cuts)], x$cuts[-1])
   d <- data.frame(name = group, good = x$good, bad = x$bad,
                   stringsAsFactors = FALSE)
   if (length(x$Missing) > 0) {
