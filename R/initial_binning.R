@@ -130,7 +130,8 @@ bin_init_char <- function(sdf, x, y, minp = 0.01) {
     summarise(count = sum(count),
               bad = sum(bad),
               good = sum(good)) %>%
-    rbind(c('_Missing_', missing_df$n, missing_df$bad, missing_df$good))
+    rbind(c('_Missing_', missing_df$n, missing_df$bad, missing_df$good)) %>%
+    filter(count > 0) # remove categories with no count
 
   # format result
   obj <- list(xlevels = obj_df$var_2,
