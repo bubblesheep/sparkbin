@@ -120,6 +120,7 @@ print.nominalbin <- function(x) {
 #' Plot intervalbin class
 #'
 #' @param x intervabin class object
+#' @export
 #'
 plot.intervalbin <- function(x) {
   require(ggplot2)
@@ -156,6 +157,7 @@ plot.intervalbin <- function(x) {
 #' Plot nominalbin class
 #'
 #' @param x nominalbin class object
+#' @export
 #'
 plot.nominalbin <- function(x) {
   require(ggplot2)
