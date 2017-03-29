@@ -33,10 +33,23 @@ print_table <- function(d) {
 }
 
 # Summary table----------------------------------------------------------------
+#' Generate binning table data
+#'
+#' @param x binning object
+#'
+#' @export
+#'
 bin_table <- function(x) {
   UseMethod("bin_table")
 }
 
+
+#' Generate binning table data for intervalbin class
+#'
+#' @param x binning object
+#'
+#' @export
+#'
 bin_table.intervalbin <- function(x) {
   group <- sprintf("[%s,%s)", x$cuts[-length(x$cuts)], x$cuts[-1])
   d <- data.frame(name = group, good = x$good, bad = x$bad,
@@ -57,6 +70,12 @@ bin_table.intervalbin <- function(x) {
            IV = ifelse(!is.finite(IV), 0, IV))
 }
 
+#' Generate binning table data for nominalbin class
+#'
+#' @param x binning object
+#'
+#' @export
+#'
 bin_table.nominalbin <- function(x) {
   require(dplyr)
   d <- with(x, {
@@ -81,6 +100,7 @@ bin_table.nominalbin <- function(x) {
 #' Function to print intervalbin object
 #'
 #' @param x the intervalbin object
+#'
 #' @export
 #'
 print.intervalbin <- function(x) {
@@ -100,6 +120,7 @@ print.intervalbin <- function(x) {
 #' Function to print nominalbin object
 #'
 #' @param x the nominal object
+#'
 #' @export
 #'
 print.nominalbin <- function(x) {
@@ -120,6 +141,7 @@ print.nominalbin <- function(x) {
 #' Plot intervalbin class
 #'
 #' @param x intervabin class object
+#'
 #' @export
 #'
 plot.intervalbin <- function(x) {
@@ -157,6 +179,7 @@ plot.intervalbin <- function(x) {
 #' Plot nominalbin class
 #'
 #' @param x nominalbin class object
+#'
 #' @export
 #'
 plot.nominalbin <- function(x) {
@@ -184,7 +207,7 @@ plot.nominalbin <- function(x) {
     geom_line(aes(name, woe), data = d_woe, group = 1,
               color = "maroon", size = 1) +
     xlab("") + ylab("Count") +
-    scale_y_continuous(labels = scales::comma)
+    scale_y_continuous(labels = scales::comma) +
     theme_bw() +
     theme(legend.position = "top",
           legend.title = element_blank(),
