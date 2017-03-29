@@ -5,3 +5,4 @@
 sampledata
 log4j.spark.log
 *.log
+.DS_Store
