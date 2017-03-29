@@ -31,7 +31,8 @@ EXAMPLE of returned object
 obj <- list(xlevels = c("A", "B", "_Missing_", "_Other_"),
             ylevels = c("A", "B", "_Missing_", "_Other_"),
             good = c(200, 200, 200, 200),
-            bad = c(100, 200, 300, 400))
+            bad = c(100, 200, 300, 400),
+            minp = 0.01)
 }
 \description{
 Initial binning for character variables

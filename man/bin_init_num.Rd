@@ -29,7 +29,7 @@ EXAMPLE returned object
 obj <- list(cuts = c(-Inf, 1.5, 10, Inf),
             good = c(200, 300, 500),
             bad = c(100, 300, 900),
-            missing = c(good = 50, bad = 50))
+            _Missing_ = c(good = 50, bad = 50))
 }
 \description{
 Initial binning for numeric variables
