@@ -41,13 +41,12 @@ bin_init_num <- function(sdf, x, y, init_bins = 100) {
   missing_bad <- missing_count$n
 
   # calcualte n-tiles
-  sdf <- sdf %>% mutate(var = as.numeric(var))
+  sdf <- sdf %>% mutate(var = as.numeric(var)) %>% filter(!is.na(var))
 
   sdf_q <- ft_quantile_discretizer(sdf, 'var', 'var_cut', init_bins)
 
   # get counts
   sdf_cut_counts <- sdf_q %>%
-    filter(!is.na(var)) %>%
     group_by(var_cut) %>%
     summarise(cuts_lower = min(var),
               cuts_higher = max(var),
