@@ -108,3 +108,34 @@ create_df1_nominalbin <- function(colname, minp){
   return(obj)
 }
 
+
+create_df1_intervalbin <- function(colname, bins){
+  # colname <- 'c'
+  # bins <- 100
+  
+  # rename for ease
+  d <- df1 %>% rename_('colname'=colname) %>% select(colname, z)
+  
+  # count missing
+  Missing <- c(
+    good = sum(df1$z[is.na(d$colname)]==0),
+    bad = sum(df1$z[is.na(d$colname)]==1)
+  )
+  
+  # n-tile for non-missing counts
+  d <- d %>% filter(!is.na(colname))
+  cuts <- c(-Inf, unique(quantile(d$colname, 1:(bins-1)/bins, na.rm = T)), Inf)
+  d$q <- cut(d$colname, cuts)
+  
+  cnts <- d %>% group_by(q) %>%
+    summarise(good = sum(z == 0),
+              bad = sum(z == 1))
+  
+  obj <- list(cuts = cuts,
+              good = unlist(cnts$good),
+              bad = unlist(cnts$bad),
+              Missing = Missing)
+  
+  class(obj) <- "intervalbin"
+  return(obj)
+}

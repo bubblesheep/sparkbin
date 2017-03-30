@@ -20,11 +20,11 @@ test_that("bin_init_num returning intervalbin?", {
   expect_is(bin_init_num(df1_tbl, 'c', 'z', 5), 'intervalbin')
   expect_is(bin_init_num(df1_tbl, 'c', 'z', 10), 'intervalbin')
   expect_is(bin_init_num(df1_tbl, 'c', 'z', 100), 'intervalbin')
-  
+
   expect_is(bin_init_num(df1_tbl, 'a', 'z', 5), 'intervalbin')
   expect_is(bin_init_num(df1_tbl, 'a', 'z', 10), 'intervalbin')
   expect_is(bin_init_num(df1_tbl, 'a', 'z', 100), 'intervalbin')
-  
+
   expect_is(bin_init_num(df1_tbl, 'e', 'z', 5), 'intervalbin')
   expect_is(bin_init_num(df1_tbl, 'e', 'z', 10), 'intervalbin')
   expect_is(bin_init_num(df1_tbl, 'e', 'z', 100), 'intervalbin')
