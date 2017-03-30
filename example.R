@@ -114,3 +114,16 @@ binobjs <- list()
 binobjs[["purpose"]] <- bin_tree(bin_init_char(sdf, 'purpose', 'target', .01))
 binobjs[["home_ownership"]] <- bin_tree(bin_init_char(sdf, 'home_ownership', 'target', .01))
 binobjs[["annual_inc"]] <- bin_tree(bin_init_num(sdf, 'annual_inc', 'target', 100))
+
+# basic sparklyr classification train and eval -----------
+
+# train-test split
+sdf_split <- sdf_partition(sdf, training = 0.7, test = 0.3, seed = 1)
+
+# train
+m <- ml_logistic_regression(sdf_split$training, target ~ grade + purpose)
+summary(m)
+
+# test auc
+test_auc <- sdf_predict(m, sdf_split$test) %>%
+  ml_binary_classification_eval(label='target', score='probability', metric='areaUnderROC')
