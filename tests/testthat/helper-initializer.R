@@ -53,6 +53,8 @@ set.seed(1)
 n <- 1000
 # generate some data
 # TODO: make colnames more interpretable
+# TODO: should try to create fields that posed challenges
+# NOTE: currently these tests are using small data
 df1 <- data.frame(a = runif(n),
                   b = sample(letters, n, replace=T),
                   c = rpois(n, 2),
