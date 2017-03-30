@@ -29,3 +29,23 @@ test_that("bin_init_num returning intervalbin?", {
   expect_is(bin_init_num(df1_tbl, 'e', 'z', 10), 'intervalbin')
   expect_is(bin_init_num(df1_tbl, 'e', 'z', 100), 'intervalbin')
 })
+
+test_that("bin_init_char not returning empty *levels?", {
+  obj <- bin_init_char(df1_tbl, 'd', 'z', .01)
+  whitespace_xlevels <- sum(str_trim(obj$xlevels) == '') 
+  whitespace_ylevels <- sum(str_trim(obj$ylevels) == '') 
+  expect_equal(whitespace_xlevels, 0)
+  expect_equal(whitespace_ylevels, 0)
+  
+  obj <- bin_init_char(df1_tbl, 'd', 'z', .05)
+  whitespace_xlevels <- sum(str_trim(obj$xlevels) == '') 
+  whitespace_ylevels <- sum(str_trim(obj$ylevels) == '') 
+  expect_equal(whitespace_xlevels, 0)
+  expect_equal(whitespace_ylevels, 0)
+  
+  obj <- bin_init_char(df1_tbl, 'd', 'z', .1)
+  whitespace_xlevels <- sum(str_trim(obj$xlevels) == '') 
+  whitespace_ylevels <- sum(str_trim(obj$ylevels) == '') 
+  expect_equal(whitespace_xlevels, 0)
+  expect_equal(whitespace_ylevels, 0)
+})

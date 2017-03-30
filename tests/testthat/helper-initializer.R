@@ -49,32 +49,48 @@ test_requires <- function(...) {
   invisible(TRUE)
 }
 
-# create df for testing ==============
-set.seed(1)
-n <- 1000
-# generate some data
-# TODO: make colnames more interpretable
-# TODO: should try to create fields that posed challenges
-# NOTE: currently these tests are using small data
-df1 <- data.frame(a = runif(n),
-                  b = sample(letters, n, replace=T),
-                  c = rpois(n, 2),
-                  d = sample(c('A', 'B', 'C'), n, replace = T, p = c(.005, .9, .095)),
-                  e = 2,
-                  f = 'TEXT',
-                  z = ifelse(runif(n) > .2, 1, 0))
-
-df1$b <- as.character(df1$b)
-df1$d <- as.character(df1$d)
-df1$f <- as.character(df1$f)
-# generate some missing values
-for(i in 1:(ncol(df1)-1)){
-  m <- round( runif(1, min=0, max=n/10) )
-  index <- sample(1:n, m)
-  df1[index,i] <- NA
+# create df for testing =========================
+generate_testing_df <- function(n=1000){
+  set.seed(1)
+  # TODO: make colnames more interpretable
+  # TODO: should try to create fields that posed challenges
+  # NOTE: all fields have NA, see below
+  # NOTE: currently these tests are using small data
+  df1 <- data.frame(a = runif(n),
+                    b = sample(letters, n, replace=T),
+                    c = rpois(n, 2),
+                    d = sample(c('A', 'B', 'C', '   ', ' ', ''), n, replace = T, p = c(.005, .4, .095, .1, .2, .3)),
+                    e = 2,
+                    f = 'TEXT',
+                    z = ifelse(runif(n) > .2, 1, 0))
+  # a: numeric
+  # b: char
+  # c: integer
+  # d: whitespace entries, categories with small proportion
+  # e: single value numeric
+  # f: single value char
+  # z: binary target variable
+  
+  # convert factor to character for testing purposes
+  cols <- sapply(df1, class)
+  for(i in 1:length(cols)){
+    if(cols[i]=='factor'){
+      df1[,i] <- as.character(df1[,i])
+    }
+  }
+  
+  # generate some missing values
+  for(i in 1:(ncol(df1)-1)){
+    m <- round( runif(1, min=0, max=n/10) )
+    index <- sample(1:n, m)
+    df1[index,i] <- NA
+  }
+  
+  return(df1)
 }
 
-# load to test sc
+# load to test sc ================================
+df1 <- generate_testing_df()
 df1_tbl <- testthat_tbl('df1')
 
 # helpers for test_optimal_binning ===============
@@ -82,10 +98,13 @@ df1_tbl <- testthat_tbl('df1')
 # create nomimal bins in local R memory
 create_df1_nominalbin <- function(colname, minp){
 
-  # colname = 'f'
-  # minp = .1
-  ifelse_expr <- sprintf("%s = ifelse(is.na(%s) | %s == '', '_Missing_', ifelse(pct < %s, '_Other_', %s))",
-                         colname, colname, colname, minp, colname)
+  # colname = 'd'
+  # minp = .01
+  index <- is.na(df1[,colname]) | str_trim(df1[,colname])==''
+  df1[index,colname] <- NA
+  
+  ifelse_expr <- sprintf("%s = ifelse(is.na(%s), '_Missing_', ifelse(pct < %s, '_Other_', %s))",
+                         colname, colname, minp, colname)
   obj_df <- df1 %>%
     group_by_(colname) %>%
     summarise(good = sum(z == 0),
@@ -96,7 +115,7 @@ create_df1_nominalbin <- function(colname, minp){
     group_by_(colname) %>%
     summarise(good = sum(good),
               bad = sum(bad))
-
+  
   obj <- list(
     xlevels = unlist(obj_df[,colname], use.names = F),
     ylevels = unlist(obj_df[,colname], use.names = F),
@@ -108,7 +127,6 @@ create_df1_nominalbin <- function(colname, minp){
   class(obj) <- "nominalbin"
   return(obj)
 }
-
 
 create_df1_intervalbin <- function(colname, bins){
   # colname <- 'c'
