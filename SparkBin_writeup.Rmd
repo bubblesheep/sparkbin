@@ -1,0 +1,67 @@
+---
+title: "SparkBin"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Optimal Binning For Spark Using Sparklyr
+
+Spark provides a general machine learning library -- MLlib -- that is designed for simplicity, scalability, and easy integration with other tools. With the scalability, language compatibility, and speed of Spark, data scientists can solve and iterate through their data problems faster. 
+
+In classic regression problems, binning is a common practice. It is especially helpful when non-linearity relationship is present and model complexity is undesired. Bining can be applied on both numerical or categorical variables, and some metrics like information value and weight of evidence can help guide the optimal binning procedures in classification problems. In standard R, there're already some functions of autobinning available for use, this time we'd like to develop autobinning functions in Spark to work seamlessly with MLlib library!
+
+
+
+### Installing and preparing sparklyr
+
+The following lines of code will install sparklyr and the lastest version of spark. sparklyr works with a full integration of the dplyr package.
+
+```{r eval = FALSE}
+#load sparklyr & dplyr
+devtools::install_github("rstudio/sparklyr")
+library(sparklyr)
+library(dplyr)
+
+# install spark
+spark_install(version = "1.6.2")
+# Connecting to spark using spark_connect, on a local connection. 
+sc <- spark_connect(master = "local")
+```
+
+
+### Development Steps
+
+We selected lending club data(https://www.kaggle.com/wendykan/lending-club-loan-data) as a prepared data with target (0/1) and various candidate features that do not need to be pre-processed. 
+
+```{r eval = FALSE}
+# Create Spark connection and load data----------------------------------------
+sc <- spark_connect("local", config = spark_config())
+
+lending_tbl <- spark_read_csv(sc, "lending", "sampledata/loan.csv")
+
+# Only select a subset of features for this excersise
+sdf <- lending_tbl %>%
+  mutate(target = ifelse(
+    loan_status %in% c("Current", "Issued", "Fully Paid"), 0, 1)) %>%
+  select(id, annual_inc, delinq_2yrs, dti, emp_length,
+         grade, home_ownership, installment,  purpose, sub_grade,
+         term, target) %>%
+  sdf_register("sdf")
+
+tbl_cache(sc, "sdf")
+```
+
+
+
+Initial Binning: We perform initial binning into a number of fine classes by equal count in sparklyr. We can define classes for the output for better structure definition.
+
+Optimal Binning: The data from initial binning are small enough so we can do optimal binning in local R using Tree based methods. The output of optimal binning should be in same class and same structure as initial binning.
+
+Binning Transformation: We use the optimal binning objects to transform the spark data frame using sparklyr and ready to do modeling.
+
+The transformed data can be fitted using logistic regression using mlib in Spark
+
+
