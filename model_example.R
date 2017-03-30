@@ -12,7 +12,7 @@ sdf <- lending_tbl %>%
   mutate(target = ifelse(
     loan_status %in% c("Current", "Issued", "Fully Paid"), 0, 1)) %>%
   select(annual_inc, delinq_2yrs, dti, emp_length,
-         home_ownership, installment,  purpose, sub_grade,
+         home_ownership, installment, purpose, sub_grade, total_rec_late_fee,
          term, target) %>%
   sdf_register("sdf")
 
