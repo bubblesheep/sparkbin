@@ -12,8 +12,13 @@
 #' @param output.col output feature name
 #' @return a new spark data frame with transformed features
 #' @export
-bin_transform_num <- function(sdf, binobj, input.col, output.col) {
-
+bin_transform_num <- function(sdf, binobj, input.col,
+                              output.col = paste0("ft_", input.col)) {
+  sdf %>%
+    ft_bucketizer(input.col, "tempxyzabc", splits = binobj$cuts) %>%
+    mutate(tempxyzabc = as.character(as.integer(tempxyzabc)),
+           tempxyzabc = ifelse(is.na(tempxyzabc), "Missing", tempxyzabc)) %>%
+    rename_(.dots = setNames(list("tempxyzabc"), output.col))
 }
 
 # Transformation Function For Character Binning Class--------------------------
