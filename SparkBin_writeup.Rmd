@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 Spark provides a general machine learning library -- MLlib -- that is designed for simplicity, scalability, and easy integration with other tools. With the scalability, language compatibility, and speed of Spark, data scientists can solve and iterate through their data problems faster. 
 
-In classic regression problems, binning is a common practice. It is especially helpful when non-linearity relationship is present and model complexity is undesired. Bining can be applied on both numerical or categorical variables, and some metrics like information value and weight of evidence can help guide the optimal binning procedures in classification problems. In standard R, there're already some functions of autobinning available for use, this time we'd like to develop autobinning functions in Spark to work seamlessly with MLlib library!
+In classic regression problems, binning is a common practice to reduce the effects of minor observation errors. It is especially helpful when non-linearity relationship is present and model complexity is undesired. Binning can be applied on both numerical or categorical variables, and metrics such as information value and weight of evidence can help guide the optimal binning procedures in classification problems. In standard R, there already exists functions for autobinning. In this package, we developed autobinning functions for binary classification in Spark to work seamlessly with MLlib library for big data preprocessing!
 
 
 
@@ -19,11 +19,12 @@ In classic regression problems, binning is a common practice. It is especially h
 
 The following lines of code will install sparklyr and the lastest version of spark. sparklyr works with a full integration of the dplyr package.
 
-```{r eval = FALSE}
+```{r eval = F}
 #load sparklyr & dplyr
 devtools::install_github("rstudio/sparklyr")
 library(sparklyr)
 library(dplyr)
+library(sparkbin)
 
 # install spark
 spark_install(version = "1.6.2")
@@ -34,9 +35,11 @@ sc <- spark_connect(master = "local")
 
 ### Development Steps
 
-We selected lending club data(https://www.kaggle.com/wendykan/lending-club-loan-data) as a prepared data with target (0/1) and various candidate features that do not need to be pre-processed. 
+#### 1. Data and Spark Connection
 
-```{r eval = FALSE}
+We selected the lending club data (https://www.kaggle.com/wendykan/lending-club-loan-data) as a prepared data with target (0/1) and various candidate features that do not need to be pre-processed. 
+
+```{r eval = F}
 # Create Spark connection and load data----------------------------------------
 sc <- spark_connect("local", config = spark_config())
 
@@ -54,14 +57,55 @@ sdf <- lending_tbl %>%
 tbl_cache(sc, "sdf")
 ```
 
+A snapshot of *sdf*:
 
 
-Initial Binning: We perform initial binning into a number of fine classes by equal count in sparklyr. We can define classes for the output for better structure definition.
+#### 2. Initial Binning
+We created **intervalbin** and **nominalbin** binning classes for numeric and character data types. Initial binning is performed to transform the variable into a number of fine classes by equal count. After applying initial binning, the data is small enough to proceed with optimal binning in local R environment. 
 
-Optimal Binning: The data from initial binning are small enough so we can do optimal binning in local R using Tree based methods. The output of optimal binning should be in same class and same structure as initial binning.
+An example of applying initial binning to a numeric variable to generate 100 bins. The output is an object that contains:
 
-Binning Transformation: We use the optimal binning objects to transform the spark data frame using sparklyr and ready to do modeling.
+- *cuts*: the cutting points from *-Inf* to *Inf*
+- *good*: number of positive labels in each bin
+- *bad*: number of negative labels in each bin
+- *_Missing_*: number of *good* and *bad* labels for missing data
 
-The transformed data can be fitted using logistic regression using mlib in Spark
+```{r eval = FALSE}
+# get initial cuts for annual income
+df <- bin_init_num(sdf, 'annual_inc', 'target', 100)
+```
+
+
+An example of applying initial binning to a character variable. The output is an object that contains:
+
+**FILL OUT!!!**
+
+```{r eval = FALSE}
+# get initial cuts for homeownership
+df <- bin_init_char(sdf, 'home_ownership', 'target', .01)
+plot(df)
+```
+
+```{r include=FALSE, echo=FALSE}
+#print(sdf)
+```
+
+
+#### 3. Optimal Binning
+The optimal binning uses tree based methods to optimize the number of bins of a given variable. The output of optimal binning should be in same class and same structure as initial binning.
+
+An example of applying optimal binning to a numeric variable after initial binning. 
+
+```{r eval = FALSE}
+# get initial cuts for homeownership
+df_opt <- bin_tree(df)
+plot(df_opt)
+```
+
+
+#### 4. Binning Transformation 
+The optimal binning object is transformed to a spark data frame using sparklyr for modeling using *MLlib*.
+
+An example using the binned data to fit a logistic regression model:
 
 
