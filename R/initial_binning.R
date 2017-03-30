@@ -100,12 +100,13 @@ bin_init_num <- function(sdf, x, y, init_bins = 100) {
 #' @export
 #'
 bin_init_char <- function(sdf, x, y, minp = 0.01) {
-
+  
   # rename columns for dplyr *_ dynamic references
   sdf <- sdf %>% rename_('var'=x, 'target'=y) %>% select(var, target)
 
   # missing counts first
-  missing_df <- sdf %>% filter(is.na(var)) %>%
+  missing_df <- sdf %>%
+    filter(is.na(var) | trim(var)=='') %>%
     summarise(n=n(), bad = sum(target), good = n() - sum(target)) %>%
     collect()
 
@@ -113,7 +114,7 @@ bin_init_char <- function(sdf, x, y, minp = 0.01) {
 
   # non-missing counts
   counts <- sdf %>%
-    filter(!is.na(var)) %>%
+    filter(!is.na(var) & !trim(var)=='') %>%
     group_by(var) %>%
     summarise(count = n(),
               bad = sum(target),
@@ -142,3 +143,4 @@ bin_init_char <- function(sdf, x, y, minp = 0.01) {
   class(obj) <- "nominalbin"
   return(obj)
 }
+
