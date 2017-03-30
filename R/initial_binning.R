@@ -52,18 +52,14 @@ bin_init_num <- function(sdf, x, y, init_bins = 100) {
               cuts_higher = max(var),
               n = n(),
               bad = sum(target),
-              good = n() - sum(target)
-    ) %>%
+              good = n() - sum(target)) %>%
     ungroup() %>%
-    arrange(var_cut) %>%
-    # mutate(cuts = paste("[", ifelse(dti_out == 0, "-Inf", cuts_lower), ",", ifelse(dti_out == 9, "Inf", cuts_higher), "]")) %>%
-    sdf_register("sdf_cut_counts")
-
+    arrange(var_cut)
   # pull results to local
   sdf_cuts_local <- collect(sdf_cut_counts)
 
   # format final object
-  obj <- list(cuts = c(-Inf, sdf_cuts_local$cuts_lower[-1], Inf),
+  obj <- list(cuts = c(-Inf, sdf_cuts_local$cuts_higher[-length(sdf_cuts_local$cuts_higher)], Inf),
               good = sdf_cuts_local$good,
               # n = sdf_cuts_local$n,
               bad = sdf_cuts_local$bad,
