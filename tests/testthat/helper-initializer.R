@@ -52,6 +52,7 @@ test_requires <- function(...) {
 set.seed(1)
 n <- 1000
 # generate some data
+# TODO: make colnames more interpretable
 df1 <- data.frame(a = runif(n),
                   b = sample(letters, n, replace=T),
                   c = rpois(n, 2),
