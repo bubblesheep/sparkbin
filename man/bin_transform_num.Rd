@@ -4,7 +4,8 @@
 \alias{bin_transform_num}
 \title{Optimal binning transformation for numeric features}
 \usage{
-bin_transform_num(sdf, binobj, input.col, output.col)
+bin_transform_num(sdf, binobj, input.col, output.col = paste0("ft_",
+  input.col))
 }
 \arguments{
 \item{sdf}{spark data frame}
