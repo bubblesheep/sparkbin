@@ -1,6 +1,7 @@
 # Load packages----------------------------------------------------------------
 library(sparklyr)
 library(dplyr)
+library(sparkbin)
 
 # Create Spark connection and load data----------------------------------------
 sc <- spark_connect("local", config = spark_config())
@@ -41,7 +42,7 @@ plot(binobjs[["term"]])
 plot(binobjs[["home_ownership"]])
 
 # Feature selection-----------#
-# Only select features with information value greater than 0.03
+# Only select features with information value greater than 0.01
 binobjs <- binobjs[sapply(binobjs, IV) > 0.01]
 
 # Transformation and modeling--------------------------------------------------
