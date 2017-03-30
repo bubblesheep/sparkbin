@@ -19,14 +19,14 @@ The intervalbin class contains the following fields
 - **cuts**: the cutting points from -Inf to Inf, example `c(-Inf, 1.5, 10, Inf)`
 - **good**: the vector of counts for good (0) of the buckets created by cuts, example `c(200, 300, 500)`
 - **bad**: the vector of counts for bad (1) of the buckets created by cuts, example `c(100, 300, 900)`
-- **\_Missing\_**: the good/bad counts for missing values, example `c(good = 50, bad = 50)`
+- **Missing**: the good/bad counts for missing values, example `c(good = 50, bad = 50)`
 
 An example of creating binning object for numeric is
 ```
 obj <- list(cuts = c(-Inf, 1.5, 10, Inf),
              good = c(200, 300, 500),
              bad = c(100, 300, 900),
-             _Missing_ = c(good = 50, bad = 50))
+             Missing = c(good = 50, bad = 50))
 
 class(obj) <- "intervalbin"
 ```
@@ -48,6 +48,70 @@ obj <- list(xlevels = c("A", "B", "_Missing_", "_Other_"),
              good = c(200, 200, 200, 200),
              bad = c(100, 200, 300, 400),
              minp = 0.01)
-             
+
 class(obj) <- "nominalbin"
+```
+
+#### Quick Example
+
+```
+# Load packages----------------------------------------------------------------
+library(sparklyr)
+library(dplyr)
+library(sparkbin)
+
+# Create Spark connection and load data----------------------------------------
+sc <- spark_connect("local", config = spark_config())
+lending_tbl <- spark_read_csv(sc, "lending", "sampledata/loan.csv")
+
+# Only select a subset of features for this excersise
+sdf <- lending_tbl %>%
+  mutate(target = ifelse(
+    loan_status %in% c("Current", "Issued", "Fully Paid"), 0, 1)) %>%
+  select(annual_inc, delinq_2yrs, dti, emp_length,
+         home_ownership, installment,  purpose, sub_grade,
+         term, target) %>%
+  sdf_register("sdf")
+
+tbl_cache(sc, "sdf")
+
+# specify numeric features and character features
+features <- sapply(sdf_schema(sdf %>% select(-target)), function(x) x$type)
+num_features <- names(features)[features %in% c("IntergerType", "DoubleType")]
+char_features <- names(features)[features == "StringType"]
+
+# Train/Test split-------------------------------------------------------------
+partitions <- sdf_partition(sdf, training = 0.6, test = 0.4)
+train <- partitions$train
+test <- partitions$test
+
+# Binning----------------------------------------------------------------------
+binobjs <- list()
+for (feature in num_features) {
+  binobjs[[feature]] <- bin_tree(bin_init_num(train, feature, "target"))
+}
+for (feature in char_features) {
+  binobjs[[feature]] <- bin_tree(bin_init_char(train, feature, "target"))
+}
+
+# check check
+plot(binobjs[["term"]])
+plot(binobjs[["home_ownership"]])
+
+# Feature selection-----------#
+# Only select features with information value greater than 0.01
+binobjs <- binobjs[sapply(binobjs, IV) > 0.01]
+
+# Transformation and modeling--------------------------------------------------
+train_transformed <- bin_transform_batch(train, binobjs)
+formula <- paste0("target~", paste0("ft_", names(binobjs), collapse = "+"))
+formula <- as.formula(formula)
+fit <- ml_logistic_regression(train_transformed %>%
+                                select(target, contains("ft_")),
+                              formula)
+
+# Evaluate in test data--------------------------------------------------------
+pred <- sdf_predict(fit, test %>% bin_transform_batch(binobjs))
+
+ml_binary_classification_eval(pred, "target", "probability")
 ```
