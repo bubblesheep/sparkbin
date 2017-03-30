@@ -86,7 +86,7 @@ class(obj) <- "nominalbin"
 df <- bin_init_num(sdf, 'dti', 'target', 100)
 df
 
-# get initial cuts for integer variable 
+# get initial cuts for integer variable
 # sdf <- sdf %>% mutate(dti_integer = row_number()) # create an integer variable to test
 df <- bin_init_num(sdf, 'id', 'target', 100)
 df
@@ -101,7 +101,7 @@ df
 df <- bin_init_char(sdf, 'home_ownership', 'target', .01)
 df
 
-# get initial cuts for integer variable 
+# get initial cuts for integer variable
 # sdf <- sdf %>% mutate(dti_integer = row_number()) # create an integer variable to test
 df <- bin_init_char(sdf, 'emp_length', 'target', .01)
 df
@@ -109,3 +109,8 @@ df
 # get initial cuts for column with some missing values
 df <- bin_init_char(sdf, 'purpose', 'target', .01)
 df
+
+binobjs <- list()
+binobjs[["purpose"]] <- bin_tree(bin_init_char(sdf, 'purpose', 'target', .01))
+binobjs[["home_ownership"]] <- bin_tree(bin_init_char(sdf, 'home_ownership', 'target', .01))
+binobjs[["annual_inc"]] <- bin_tree(bin_init_num(sdf, 'annual_inc', 'target', 100))

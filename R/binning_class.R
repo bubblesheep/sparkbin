@@ -214,3 +214,14 @@ plot.nominalbin <- function(x) {
           legend.key = element_blank(),
           axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1))
 }
+
+#' Calculate information value
+#'
+#' @param x binning object
+#' @export
+#'
+IV <- function(x) {
+  sum(bin_table(x)$IV)
+}
+
+
