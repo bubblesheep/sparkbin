@@ -36,6 +36,13 @@ sparkbin_auto_model <- function(sc, sdf, y, minIV = 0.03, ...) {
     binobjs[[feature]] <- bin_tree(bin_init_char(train, feature, y))
   }
   binobjs <- binobjs[sapply(binobjs, IV) > minIV]
+  # if no bins are kept the downstream code will break.
+  # for now just aborting execution.
+  # TODO: a bin like this [-Inf,Inf) also breaks execution
+  if(length(binobjs)==0) {
+    print('No bins kept. Aborting.')
+    return(NULL)
+  }
   # Modeling
   print('Training...')
   train_transformed <- bin_transform_batch(train, binobjs)
