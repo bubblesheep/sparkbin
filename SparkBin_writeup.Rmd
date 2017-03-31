@@ -80,7 +80,7 @@ An example of applying initial binning to a character variable. The output is an
 - *good* - number of goods in each xlevel
 - *bad* - number of bads in each xlevel
 
-```{r echo = FALSE, warning = FALSE, cache = TRUE}
+```{r warning = FALSE, cache = TRUE}
 # get initial cuts for homeownership
 # bin_init_char(data, 'input variable', 'target variable', minp)
 df <- bin_init_char(sdf, 'home_ownership', 'target', .01)
@@ -89,12 +89,11 @@ df
 
 
 #### 3. Optimal Binning
-The optimal binning uses tree based methods to optimize the number of bins of a given variable. The output of optimal binning should be in same class and same structure as initial binning.
+The optimal binning uses a [recursive partitioning tree method](https://cran.r-project.org/web/packages/party/party.pdf) to optimize the number of bins of a given variable. The output of optimal binning is in the same class and structure as initial binning. *bin_tree* has two classes *intervalbin* and *nominalbin*, and *bin_tree()* automatically detects the class of the input and returns the same class and structure as initial binning.
 
-An example of applying optimal binning to a numeric variable after initial binning. 
+An example of applying optimal binning to *home_ownership* after initial binning. The *plot()* method visualizes the optimized bins with new group names and weight of evidence (WOE) of each bin.  
 
 ```{r warning = FALSE, cache = TRUE}
-# get initial cuts for homeownership
 df_opt <- bin_tree(df)
 p <- plot(df_opt)
 print(p)
@@ -102,8 +101,7 @@ print(p)
 
 
 #### 4. Binning Transformation 
-The optimal binning object is transformed to a spark data frame using sparklyr for modeling using *MLlib*.
-
+The optimal binning object is transformed to a Spark data frame with the new group names mapped and ready for modeling using *MLlib*.
 
 
 ### Modeling Example
@@ -123,39 +121,3 @@ train <- partitions$train %>% sdf_register("train")
 test <- partitions$test
 
 tbl_cache(sc, "train")
-
-# Binning----------------------------------------------------------------------
-binobjs <- list()
-for (feature in num_features) {
-  binobjs[[feature]] <- bin_tree(bin_init_num(train, feature, "target"))
-}
-for (feature in char_features) {
-  binobjs[[feature]] <- bin_tree(bin_init_char(train, feature, "target"))
-}
-
-# Feature selection-----------#
-# Only select features with information value greater than 0.01
-binobjs <- binobjs[sapply(binobjs, IV) > 0.01]
-print("After autobinning using sparkbin package, the input variables are binned into: ")
-print(binobjs)
-
-# Transformation and modeling--------------------------------------------------
-train_transformed <- bin_transform_batch(train, binobjs)
-formula <- paste0("target~", paste0("ft_", names(binobjs), collapse = "+"))
-print(paste("The model formula is:", formula))
-formula <- as.formula(formula)
-fit <- ml_logistic_regression(train_transformed %>%
-                                select(target, contains("ft_")),
-                              formula)
-
-
-# Evaluate in test data--------------------------------------------------------
-pred <- sdf_predict(fit, test %>% bin_transform_batch(binobjs))
-
-auc <- ml_binary_classification_eval(pred, "target", "probability")
-
-print(paste("Final model AUC:", auc))
-
-```
-
-
