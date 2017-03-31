@@ -27,6 +27,7 @@ sparkbin_auto_model <- function(sc, sdf, y, minIV = 0.03, ...) {
   train <- partitions$train
   test <- partitions$test
   # Binning
+  print('Binning...')
   binobjs <- list()
   for (feature in num_features) {
     binobjs[[feature]] <- bin_tree(bin_init_num(train, feature, y))
@@ -35,14 +36,24 @@ sparkbin_auto_model <- function(sc, sdf, y, minIV = 0.03, ...) {
     binobjs[[feature]] <- bin_tree(bin_init_char(train, feature, y))
   }
   binobjs <- binobjs[sapply(binobjs, IV) > minIV]
+  # if no bins are kept the downstream code will break.
+  # for now just aborting execution.
+  # TODO: a bin like this [-Inf,Inf) also breaks execution
+  if(length(binobjs)==0) {
+    print('No bins kept. Aborting.')
+    return(NULL)
+  }
   # Modeling
+  print('Training...')
   train_transformed <- bin_transform_batch(train, binobjs)
+  train_transformed
   formula <- sprintf("%s~%s", y, paste0("ft_", names(binobjs), collapse = "+"))
   formula <- as.formula(formula)
   fit <- ml_logistic_regression(train_transformed %>%
                                   select(one_of(y), contains("ft_")),
                                 formula)
   # Evaluation
+  print('Evaluating...')
   pred <- sdf_predict(fit, test %>% bin_transform_batch(binobjs))
   auc <- ml_binary_classification_eval(pred, y, "probability")
   # Output
