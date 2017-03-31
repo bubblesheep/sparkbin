@@ -30,10 +30,10 @@ sparkbin_auto_model <- function(sc, sdf, y, minIV = 0.03, ...) {
   print('Binning...')
   binobjs <- list()
   for (feature in num_features) {
-    binobjs[[feature]] <- bin_tree(bin_init_num(train, feature, y))
+    binobjs[[feature]] <- bin_tree(bin_init(train, feature, y))
   }
   for (feature in char_features) {
-    binobjs[[feature]] <- bin_tree(bin_init_char(train, feature, y))
+    binobjs[[feature]] <- bin_tree(bin_init(train, feature, y))
   }
   binobjs <- binobjs[sapply(binobjs, IV) > minIV]
   # if no bins are kept the downstream code will break.
