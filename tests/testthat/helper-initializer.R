@@ -12,7 +12,7 @@ testthat_spark_connection <- function(version = NULL) {
   if (!connected) {
     version <- Sys.getenv("SPARK_VERSION", unset = "2.0.0")
     setwd(tempdir())
-    sc <- spark_connect(master = "local", config = spark_config())
+    sc <- sparklyr::spark_connect(master = "local", config = sparklyr::spark_config())
     assign(".testthat_spark_connection", sc, envir = .GlobalEnv)
   }
 
