@@ -15,7 +15,7 @@ sparkbin_auto_model <- function(sc, sdf, y, minIV = 0.03, ...) {
   # Check if sdf is data frame or spark data frame
   require(sparklyr)
   if (inherits(sdf, "data.frame")) {
-    sdf <- copy_to(sc, sdf, "_mytempsdftable_")
+    sdf <- copy_to(sc, sdf, "_mytempsdftable_", overwrite = TRUE)
   }
   # Check numeric and character features
   features <- sapply(sdf_schema(sdf), function(x) x$type)
@@ -44,7 +44,7 @@ sparkbin_auto_model <- function(sc, sdf, y, minIV = 0.03, ...) {
                                 formula)
   # Evaluation
   pred <- sdf_predict(fit, test %>% bin_transform_batch(binobjs))
-  auc <- ml_binary_classification_eval(pred, "target", "probability")
+  auc <- ml_binary_classification_eval(pred, y, "probability")
   # Output
   list(binobjs = binobjs,
        auc = auc,
