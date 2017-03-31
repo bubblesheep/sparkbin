@@ -57,3 +57,6 @@ fit <- ml_logistic_regression(train_transformed %>%
 pred <- sdf_predict(fit, test %>% bin_transform_batch(binobjs))
 
 ml_binary_classification_eval(pred, "target", "probability")
+
+# PUT them together using aumatic modeling function
+result <- sparkbin_auto_model(sc, sdf, "target")
