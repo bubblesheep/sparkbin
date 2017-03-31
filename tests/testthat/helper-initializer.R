@@ -1,5 +1,6 @@
+require(sparklyr)
+
 testthat_spark_connection <- function(version = NULL) {
-  require(sparklyr)
 
   # generate connection if none yet exists
   connected <- FALSE
@@ -11,7 +12,7 @@ testthat_spark_connection <- function(version = NULL) {
   if (!connected) {
     version <- Sys.getenv("SPARK_VERSION", unset = "2.0.0")
     setwd(tempdir())
-    sc <- spark_connect(master = "local", config = spark_config())
+    sc <- sparklyr::spark_connect(master = "local", config = sparklyr::spark_config())
     assign(".testthat_spark_connection", sc, envir = .GlobalEnv)
   }
 
@@ -71,7 +72,7 @@ df1$z[is.na(df1$z)] <- 0
   # e: single value numeric
   # f: single value char
   # z: binary target variable
-  
+
   # convert factor to character for testing purposes
   cols <- sapply(df1, class)
   for(i in 1:length(cols)){
@@ -79,14 +80,14 @@ df1$z[is.na(df1$z)] <- 0
       df1[,i] <- as.character(df1[,i])
     }
   }
-  
+
   # generate some missing values
   for(i in 1:(ncol(df1)-1)){
     m <- round( runif(1, min=0, max=n/10) )
     index <- sample(1:n, m)
     df1[index,i] <- NA
   }
-  
+
   return(df1)
 }
 
@@ -103,7 +104,7 @@ create_df1_nominalbin <- function(colname, minp){
   # minp = .01
   index <- is.na(df1[,colname]) | str_trim(df1[,colname])==''
   df1[index,colname] <- NA
-  
+
   ifelse_expr <- sprintf("%s = ifelse(is.na(%s), '_Missing_', ifelse(pct < %s, '_Other_', %s))",
                          colname, colname, minp, colname)
   obj_df <- df1 %>%
@@ -116,7 +117,7 @@ create_df1_nominalbin <- function(colname, minp){
     group_by_(colname) %>%
     summarise(good = sum(good),
               bad = sum(bad))
-  
+
   obj <- list(
     xlevels = unlist(obj_df[,colname], use.names = F),
     ylevels = unlist(obj_df[,colname], use.names = F),
