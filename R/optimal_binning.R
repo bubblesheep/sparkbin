@@ -117,3 +117,5 @@ bin_tree.nominalbin <- function(x, ...) {
   class(newobj) <- "nominalbin"
   newobj
 }
+
+# IDEA:  bin_tree() <- bin_tree(bin_init_num()) | bin_tree(bin_init_char())

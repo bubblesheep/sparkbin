@@ -61,8 +61,9 @@ generate_testing_df <- function(n=1000){
                     c = rpois(n, 2),
                     d = sample(c('A', 'B', 'C', '   ', ' ', ''), n, replace = T, p = c(.005, .4, .095, .1, .2, .3)),
                     e = 2,
-                    f = 'TEXT',
-                    z = ifelse(runif(n) > .2, 1, 0))
+                    f = 'TEXT')
+df1$z = ifelse(df1$a^2 + df1$c/max(df1$c, na.rm=T) + rnorm(n, 0,.3)  > .6, 1, 0)
+df1$z[is.na(df1$z)] <- 0
   # a: numeric
   # b: char
   # c: integer
