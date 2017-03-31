@@ -20,7 +20,7 @@ tbl_cache(sc, "sdf")
 
 # specify numeric features and character features
 features <- sapply(sdf_schema(sdf %>% select(-target)), function(x) x$type)
-num_features <- names(features)[features %in% c("IntergerType", "DoubleType")]
+num_features <- names(features)[features %in% c("IntegerType", "DoubleType")]
 char_features <- names(features)[features == "StringType"]
 
 # Train/Test split-------------------------------------------------------------

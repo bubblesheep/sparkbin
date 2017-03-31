@@ -43,7 +43,7 @@ bin_transform_char <- function(sdf, binobj, input.col,
   temp_map <- copy_to(sc, mapd, temp_tbl, overwrite = TRUE)
 
   newsdf <- sdf %>%
-    mutate_(tempxyabc = sprintf("ifelse(is.na(%s), '_Missing_', %s)",
+    mutate_(tempxyabc = sprintf("ifelse(is.na(%s) | trim(%s) =='', '_Missing_', %s)",
                                 input.col, input.col)) %>%
     mutate(tempxyabc = ifelse(!(tempxyabc %in% binobj$xlevels), "_Other_", tempxyabc)) %>%
     left_join(temp_map, by = c("tempxyabc" = "original_level")) %>%
