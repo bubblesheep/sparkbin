@@ -16,10 +16,12 @@
 bin_transform_num <- function(sdf, binobj, input.col,
                               output.col = paste0("ft_", input.col)) {
   newsdf <- sdf %>%
-    ft_bucketizer(input.col, "tempxyzabc", splits = binobj$cuts) %>%
+    mutate_(temptempabc = sprintf("as.numeric(%s)", input.col)) %>%
+    ft_bucketizer("temptempabc", "tempxyzabc", splits = binobj$cuts) %>%
     mutate(tempxyzabc = as.character(as.integer(tempxyzabc)),
            tempxyzabc = ifelse(is.na(tempxyzabc), "Missing", tempxyzabc)) %>%
-    rename_(.dots = setNames(list("tempxyzabc"), output.col))
+    rename_(.dots = setNames(list("tempxyzabc"), output.col)) %>%
+    select(-temptempabc)
   newsdf
 }
 
@@ -44,7 +46,7 @@ bin_transform_char <- function(sdf, binobj, input.col,
 
   newsdf <- sdf %>%
     mutate_(tempxyabc = sprintf("ifelse(is.na(%s) | trim(%s) =='', '_Missing_', %s)",
-                                input.col, input.col)) %>%
+                                input.col, input.col, input.col)) %>%
     mutate(tempxyabc = ifelse(!(tempxyabc %in% binobj$xlevels), "_Other_", tempxyabc)) %>%
     left_join(temp_map, by = c("tempxyabc" = "original_level")) %>%
     rename_(.dots = setNames(list("dest_level"), output.col)) %>%
