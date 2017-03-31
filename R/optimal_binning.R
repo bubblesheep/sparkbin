@@ -96,12 +96,16 @@ bin_tree.nominalbin <- function(x, ...) {
   groups <- list()
   extract_terminal(fit@tree)
   # Create output-- a little stupid way, can modify later---#
-  ylevels <- rep(NA, length(x$xlevels))
-  names(ylevels) <- x$xlevels
-  for (i in seq_along(groups)) {
-    ylevels[groups[[i]]] <- paste0("G", i)
+  if (length(groups) == 0) {
+    ylevels <- rep("G1", length(x$xlevels))
+  } else {
+    ylevels <- rep(NA, length(x$xlevels))
+    names(ylevels) <- x$xlevels
+    for (i in seq_along(groups)) {
+      ylevels[groups[[i]]] <- paste0("G", i)
+    }
+    names(ylevels) <- NULL
   }
-  names(ylevels) <- NULL
   # Output new objects
   newobj <- list(
     xlevels = x$xlevels,

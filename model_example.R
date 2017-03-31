@@ -18,7 +18,7 @@ tbl_cache(sc, "sdf")
 
 # specify numeric features and character features
 features <- sapply(sdf_schema(sdf %>% select(-target)), function(x) x$type)
-num_features <- names(features)[features %in% c("IntergerType", "DoubleType")]
+num_features <- names(features)[features %in% c("IntegerType", "DoubleType")]
 char_features <- names(features)[features == "StringType"]
 
 # Train/Test split-------------------------------------------------------------
@@ -57,3 +57,6 @@ fit <- ml_logistic_regression(train_transformed %>%
 pred <- sdf_predict(fit, test %>% bin_transform_batch(binobjs))
 
 ml_binary_classification_eval(pred, "target", "probability")
+
+# PUT them together using aumatic modeling function
+result <- sparkbin_auto_model(sc, sdf, "target")

@@ -115,3 +115,23 @@ pred <- sdf_predict(fit, test %>% bin_transform_batch(binobjs))
 
 ml_binary_classification_eval(pred, "target", "probability")
 ```
+
+#### Automatic Model Building
+
+Our example can be easily wrapped to a function to perform automatic model building. `sparkbin_auto_model` provides this functionality, the use of which is demonstrated as below,
+
+```
+result <- sparkbin_auto_model(sc, sdf, "target")
+```
+
+There are a few advantages to using binning to do automatic modeling:
+
+- No need to pre-process data
+- No need to handle missing data, the function handles for you
+- No need to do feature selection, the function select featureas based on information values
+- No need to handle outlier
+- No need to handle non-linearlity
+- The outcome model is highly interpretable
+- and more...
+
+Basically, we can simply throw a data mostly with its original unprocessed form to the function, and the function can quickly provide a decent model for you.

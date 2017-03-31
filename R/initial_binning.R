@@ -59,7 +59,7 @@ bin_init_num <- function(sdf, x, y, init_bins = 100) {
   sdf_cuts_local <- collect(sdf_cut_counts)
 
   # format final object
-  obj <- list(cuts = c(-Inf, sdf_cuts_local$cuts_higher[-length(sdf_cuts_local$cuts_higher)], Inf),
+  obj <- list(cuts = c(-Inf, sdf_cuts_local$cuts_lower[-1], Inf),
               good = sdf_cuts_local$good,
               # n = sdf_cuts_local$n,
               bad = sdf_cuts_local$bad,
@@ -96,7 +96,7 @@ bin_init_num <- function(sdf, x, y, init_bins = 100) {
 #' @export
 #'
 bin_init_char <- function(sdf, x, y, minp = 0.01) {
-  
+
   # rename columns for dplyr *_ dynamic references
   sdf <- sdf %>% rename_('var'=x, 'target'=y) %>% select(var, target)
 
