@@ -11,9 +11,7 @@ lending_tbl <- spark_read_csv(sc, "lending", "sampledata/loan.csv")
 sdf <- lending_tbl %>%
   mutate(target = ifelse(
     loan_status %in% c("Current", "Issued", "Fully Paid"), 0, 1)) %>%
-  select(annual_inc, delinq_2yrs, dti, emp_length,
-         home_ownership, installment, purpose, sub_grade, total_rec_late_fee,
-         term, target) %>%
+  select( -total_rec_late_fee, -id, -member_id) %>%
   sdf_register("sdf")
 
 tbl_cache(sc, "sdf")
@@ -25,8 +23,10 @@ char_features <- names(features)[features == "StringType"]
 
 # Train/Test split-------------------------------------------------------------
 partitions <- sdf_partition(sdf, training = 0.6, test = 0.4)
-train <- partitions$train
+train <- partitions$train %>% sdf_register("train")
 test <- partitions$test
+
+tbl_cache(sc, "train")
 
 # Binning----------------------------------------------------------------------
 binobjs <- list()
@@ -43,7 +43,7 @@ plot(binobjs[["home_ownership"]])
 
 # Feature selection-----------#
 # Only select features with information value greater than 0.01
-binobjs <- binobjs[sapply(binobjs, IV) > 0.01]
+binobjs <- binobjs[sapply(binobjs, IV) > 0.1]
 
 # Transformation and modeling--------------------------------------------------
 train_transformed <- bin_transform_batch(train, binobjs)
