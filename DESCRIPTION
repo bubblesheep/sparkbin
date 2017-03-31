@@ -1,12 +1,20 @@
 Package: sparkbin
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Auto-Binning Spark Data Frame
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+Authors@R: c(
+    person("Xiangdong", "Gu", email = "xgu@massmutual.com", role = "cre"),
+    person("Alex", "Baldenko", email = "abaldenko@massmutual.com", role = "aut"),
+    person("Jasmine", "Geng", email = "jgeng@massmutual.com", role = "aut"),
+    person("Yue", "Tang", email = "ytang@massmutual.com", role = "aut"))
+Maintainer: Xiangdong Gu <xgu@massmutual.com>
+Description: An implementation of automatic binning in Spark for binary classification problems. It bins numeric and character variables of a Spark data frame using classification tree method. 
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 5.0.1
+Imports: 
+  dplyr,
+  sparklyr,
+  ggplot2
+
