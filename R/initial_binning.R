@@ -140,3 +140,49 @@ bin_init_char <- function(sdf, x, y, minp = 0.01) {
   return(obj)
 }
 
+
+#' Initial binning for all variables
+#' @param sdf Spark data frame
+#' @param x the variable to bin
+#' @param y the target variable, which should take only values 0 and 1,
+#' no missing should be allowed
+#' @param init_bins number of initial bins for numeric variables
+#' for character variables, init_bins is equal to 1/minp
+#' where minp is the minimum frequency of a level, if the frequency is less than
+#' minp then the corresponding level will be grouped to '_Other_'
+#' @return for numeric variable x, it returns a numeric binning object with class name "intervalbin" with the
+#' following fields:
+#' cuts - the break points (left end should be -Inf, right end should be Inf)
+#' good - number of good (0) in each interval
+#' bad - number of bad (1) in each interval
+#' missing - a list with two components for missing values: good count and
+#' bad count
+#' for character variable x, it returns a character binning object with class name "nominalbin" with the
+#' following fields:
+#' xlevels - including major levels (> minp) and two special levels
+#' "_Missing_" and "_Other_"
+#' ylevels - mapped new levels, in the initial binning it should be same as
+#' xlevels
+#' good - number of good in each xlevel
+#' bad - number of bad in each xlevel
+#'
+#' EXAMPLE of returned object
+#' obj <- list(xlevels = c("A", "B", "_Missing_", "_Other_"),
+#'             ylevels = c("A", "B", "_Missing_", "_Other_"),
+#'             good = c(200, 200, 200, 200),
+#'             bad = c(100, 200, 300, 400),
+#'             minp = 0.01)
+#' @export
+#'
+
+bin_init <- function(sdf, x, y, init_bins = 100){
+  jobj <- spark_dataframe(sdf %>% select_(x))
+  type <- invoke(invoke(invoke(jobj, "schema"), "fields")[[1]], "dataType")
+  if(grepl("[Ss]tring", invoke(type, "toString")) == TRUE){
+    bin_init_char(sdf, x, y, minp = 1/init_bins)
+  }else if(grepl("([Dd]ouble)|[Ii]nteger", invoke(type, "toString")) == TRUE){
+    bin_init_num(sdf, x, y, init_bins)
+  }
+}
+
+

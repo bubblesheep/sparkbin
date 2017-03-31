@@ -115,6 +115,15 @@ binobjs[["purpose"]] <- bin_tree(bin_init_char(sdf, 'purpose', 'target', .01))
 binobjs[["home_ownership"]] <- bin_tree(bin_init_char(sdf, 'home_ownership', 'target', .01))
 binobjs[["annual_inc"]] <- bin_tree(bin_init_num(sdf, 'annual_inc', 'target', 100))
 
+# bin_init examples ------------------------------------
+# get initial cuts for the character variable (home_ownership)
+df <- bin_init(sdf, 'home_ownership', 'target', 100)
+df
+
+# get initial cuts for the numeric variable (dti)
+df <- bin_init(sdf, 'dti', 'target', 100)
+df
+
 # basic sparklyr classification train and eval -----------
 
 # train-test split
