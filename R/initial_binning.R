@@ -176,13 +176,11 @@ bin_init_char <- function(sdf, x, y, minp = 0.01) {
 #'
 
 bin_init <- function(sdf, x, y, init_bins = 100){
-  jobj <- spark_dataframe(sdf %>% select_(x))
-  type <- invoke(invoke(invoke(jobj, "schema"), "fields")[[1]], "dataType")
-  if(grepl("[Ss]tring", invoke(type, "toString")) == TRUE){
-    bin_init_char(sdf, x, y, minp = 1/init_bins)
-  }else if(grepl("([Dd]ouble)|[Ii]nteger", invoke(type, "toString")) == TRUE){
+  type <- sdf_schema(sdf)[[x]]$type
+  if(grepl("([Ff]loat)|([Dd]ouble)|([Ii]nteger)|([Ll]ong)|([Ss]hort)", type) == TRUE){
     bin_init_num(sdf, x, y, init_bins)
+  }else{
+    bin_init_char(sdf, x, y, minp = 1/init_bins)
   }
 }
-
 
