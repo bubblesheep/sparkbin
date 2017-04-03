@@ -1,5 +1,9 @@
 require(sparklyr)
 
+if(sum(spark_installed_versions()$spark=='2.0.0') < 1){
+  sparklyr::spark_install(version='2.0.0')
+}
+
 testthat_spark_connection <- function(version = NULL) {
 
   # generate connection if none yet exists
