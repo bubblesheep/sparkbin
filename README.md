@@ -136,4 +136,4 @@ There are a few advantages to using binning to do automatic modeling:
 
 Basically, we can simply throw a data mostly with its original unprocessed form to the function, and the function can quickly provide a decent model for you.
 
-[![Travis-CI Build Status](https://travis-ci.org/.svg?branch=master)](https://travis-ci.org/)
+[![Travis-CI Build Status](https://travis-ci.org/massmutual/sparkbin.svg?branch=master)](https://travis-ci.org/)
