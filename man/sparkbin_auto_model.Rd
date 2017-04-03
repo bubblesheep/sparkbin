@@ -20,4 +20,3 @@ sparkbin_auto_model(sc, sdf, y, minIV = 0.03, ...)
 \description{
 Automatic modeling using sparkbin package
 }
-

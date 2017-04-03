@@ -18,4 +18,3 @@ bin_transform(sdf, binobj, input.col, output.col = paste0("ft_", input.col))
 \description{
 Transformation Function For Binning Object
 }
-

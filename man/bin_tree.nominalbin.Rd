@@ -17,4 +17,3 @@ a new nominalbin object
 \description{
 Optimal binning using tree for character variable
 }
-

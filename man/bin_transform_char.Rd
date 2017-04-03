@@ -22,4 +22,3 @@ a new spark data frame with transformed features
 \description{
 Optimal binning transformation for character features
 }
-

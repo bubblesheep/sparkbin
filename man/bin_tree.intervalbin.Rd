@@ -17,4 +17,3 @@ a new intervalbin object
 \description{
 Optimal binning using tree for numeric variable
 }
-

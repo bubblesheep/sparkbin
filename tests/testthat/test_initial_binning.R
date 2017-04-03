@@ -1,5 +1,7 @@
 context("Initial Binning")
 
+# print(df1_tbl)
+
 # basic char tests -----------
 test_that("bin_init_char returning nomialbin?", {
   expect_is(bin_init_char(df1_tbl, 'b', 'z', .001), 'nominalbin')
@@ -32,20 +34,20 @@ test_that("bin_init_num returning intervalbin?", {
 
 test_that("bin_init_char not returning empty *levels?", {
   obj <- bin_init_char(df1_tbl, 'd', 'z', .01)
-  whitespace_xlevels <- sum(str_trim(obj$xlevels) == '') 
-  whitespace_ylevels <- sum(str_trim(obj$ylevels) == '') 
+  whitespace_xlevels <- sum(str_trim(obj$xlevels) == '')
+  whitespace_ylevels <- sum(str_trim(obj$ylevels) == '')
   expect_equal(whitespace_xlevels, 0)
   expect_equal(whitespace_ylevels, 0)
-  
+
   obj <- bin_init_char(df1_tbl, 'd', 'z', .05)
-  whitespace_xlevels <- sum(str_trim(obj$xlevels) == '') 
-  whitespace_ylevels <- sum(str_trim(obj$ylevels) == '') 
+  whitespace_xlevels <- sum(str_trim(obj$xlevels) == '')
+  whitespace_ylevels <- sum(str_trim(obj$ylevels) == '')
   expect_equal(whitespace_xlevels, 0)
   expect_equal(whitespace_ylevels, 0)
-  
+
   obj <- bin_init_char(df1_tbl, 'd', 'z', .1)
-  whitespace_xlevels <- sum(str_trim(obj$xlevels) == '') 
-  whitespace_ylevels <- sum(str_trim(obj$ylevels) == '') 
+  whitespace_xlevels <- sum(str_trim(obj$xlevels) == '')
+  whitespace_ylevels <- sum(str_trim(obj$ylevels) == '')
   expect_equal(whitespace_xlevels, 0)
   expect_equal(whitespace_ylevels, 0)
 })

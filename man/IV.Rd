@@ -12,4 +12,3 @@ IV(x)
 \description{
 Calculate information value
 }
-

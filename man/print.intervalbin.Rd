@@ -12,4 +12,3 @@
 \description{
 Function to print intervalbin object
 }
-

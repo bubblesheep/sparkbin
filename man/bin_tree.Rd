@@ -14,4 +14,3 @@ bin_tree(x, ...)
 \description{
 Optimal binning using classification tree method
 }
-

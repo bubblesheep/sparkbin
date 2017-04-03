@@ -14,4 +14,3 @@ bin_transform_batch(sdf, binobjs)
 \description{
 Transform Function using a list of Binning Object
 }
-

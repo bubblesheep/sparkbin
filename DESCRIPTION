@@ -12,9 +12,11 @@ Description: An implementation of automatic binning in Spark for binary classifi
 License: MIT
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 5.0.1
+RoxygenNote: 6.0.1
 Imports: 
   dplyr,
   sparklyr,
-  ggplot2
-
+  ggplot2,
+  testthat,
+  stringr,
+  scales

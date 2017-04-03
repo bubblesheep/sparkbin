@@ -12,4 +12,3 @@ bin_table(x)
 \description{
 Generate binning table data
 }
-

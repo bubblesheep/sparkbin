@@ -34,4 +34,3 @@ obj <- list(cuts = c(-Inf, 1.5, 10, Inf),
 \description{
 Initial binning for numeric variables
 }
-

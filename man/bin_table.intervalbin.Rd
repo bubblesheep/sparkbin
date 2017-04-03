@@ -12,4 +12,3 @@
 \description{
 Generate binning table data for intervalbin class
 }
-

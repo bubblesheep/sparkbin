@@ -12,4 +12,3 @@
 \description{
 Plot nominalbin class
 }
-

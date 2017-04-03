@@ -63,7 +63,7 @@ generate_testing_df <- function(n=1000){
                     d = sample(c('A', 'B', 'C', '   ', ' ', ''), n, replace = T, p = c(.005, .4, .095, .1, .2, .3)),
                     e = 2,
                     f = 'TEXT')
-df1$z = ifelse(df1$a^2 + df1$c/max(df1$c, na.rm=T) + rnorm(n, 0,.3)  > .6, 1, 0)
+df1$z = ifelse(df1$a^2 + df1$c/max(df1$c, na.rm=T) + rnorm(n, 0,.1)  > .6, 1, 0)
 df1$z[is.na(df1$z)] <- 0
   # a: numeric
   # b: char
@@ -94,6 +94,7 @@ df1$z[is.na(df1$z)] <- 0
 # load to test sc ================================
 df1 <- generate_testing_df()
 df1_tbl <- testthat_tbl('df1')
+# print(df1_tbl)
 
 # helpers for test_optimal_binning ===============
 
